@@ -1,24 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useCallback, useState } from "react";
+import "./App.css";
+import SearchBar from "./components/SearchBar";
+import List from "./components/List";
+import useRepos from "./hooks/useRepos";
 
 function App() {
+  const [search, setSearch] = useState("");
+  const { repos, loading, fetchMore, resetRepos, error } = useRepos({
+    q: search,
+  });
+  const handleSearch = useCallback((search: string) => {
+    setSearch(search);
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <SearchBar onSearch={handleSearch} onTyping={resetRepos} />
+      {repos && (
+        <List list={repos} isLoading={loading} onNextPage={fetchMore} />
+      )}
+      {error && <div>{error}</div>}
     </div>
   );
 }
